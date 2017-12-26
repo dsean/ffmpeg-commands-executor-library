@@ -114,6 +114,7 @@
 
 const char program_name[] = "ffmpeg";
 const int program_birth_year = 2000;
+int mpid = 0;
 
 static FILE *vstats_file;
 
@@ -4215,7 +4216,7 @@ JNIEXPORT jstring Java_cn_dxjia_ffmpeg_library_FFmpegNativeHelper_ffmpeg_1run(
     pipe(pipeFD);
 
     pid = fork();
-
+    
     if (pid < 0) {
         goto done;
     } else if (pid == 0) {
@@ -4241,6 +4242,7 @@ JNIEXPORT jstring Java_cn_dxjia_ffmpeg_library_FFmpegNativeHelper_ffmpeg_1run(
 
         exit(0);
     } else {
+        mpid = pid;
         close(pipeFD[1]);
 
         read(pipeFD[0], retBuffer, sizeof(retBuffer));
@@ -4290,6 +4292,7 @@ JNIEXPORT jint JNICALL Java_cn_dxjia_ffmpeg_library_FFmpegNativeHelper_ffmpeg_1u
   (JNIEnv * env, jobject thiz)
 {
     // Deprecated
+    kill(mpid,SIGKILL);
     //ffmpeg_cleanup(0);
     return 0;
 }
